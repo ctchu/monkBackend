@@ -1,0 +1,5 @@
+connectionString : localhost:5432
+dbname : postgres
+user : postgres
+contractStoreTableName: contract
+turtleStoreTableName: turtle

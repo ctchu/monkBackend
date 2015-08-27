@@ -1,0 +1,7 @@
+# default turtle
+---
+monk_type: Contract
+table_name: contract
+name:  defaultContract
+creator: monk
+description:  default contract

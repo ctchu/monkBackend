@@ -1,0 +1,11 @@
+# contract table column and format
+---
+_id: uuid
+monk_type: text
+table_name: text
+name:  text
+creator: text
+created_time: text
+last_modified: text
+description:  text
+turtle_id: uuid
