@@ -10,5 +10,5 @@ last_modified: text
 description:  text
 m: integer
 rho: double precision
-weights: double precision[]
+weights: json
 weights_dimension: integer

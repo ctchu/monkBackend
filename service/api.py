@@ -21,6 +21,7 @@ import sys
 import uuid
 import logging
 import json
+import ast
 logger = logging.getLogger("monk.api")
 logging.basicConfig(filename='.\\log\\logfile.log', filemode='w', level=logging.INFO)
 
@@ -144,8 +145,9 @@ def deleteTableColumn(category, column):
 def updateTurtleIdInContractTable(contractId, turtleId):
     crane.contractStore.update_turtleId(ContractTable, contractId, turtleId)
         
-# server API
+#=========================================== server API ===========================================
 #===========================================
+# Check out consensus model
 #===========================================
 @monkService.route('/api/v1.0/checkout', methods=['GET'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -165,6 +167,7 @@ def CheckOut():
 # curl -i -H "Content-Type: application/json" -X GET -d "{""contract_id"":""03081145-d15d-40d5-9b08-879da802e944""}" http://localhost:5000/api/v1.0/checkout
         
 #===========================================
+# Merge and update consensus model
 #===========================================
 @monkService.route('/api/v1.0/merge', methods=['PUT'])
 @cross_origin(allow_headers=['Content-Type'])
@@ -177,7 +180,14 @@ def Merge():
     print contractId    
     turtle = load_turtle(contractId)
     print request.json['delta']
-    delta  = json.loads(request.json['delta'])
+    
+    # if using array type as delta
+    #delta  = json.loads(request.json['delta'])
+    
+    # if using json type as delta
+    delta = ast.literal_eval(request.json['delta'])     # transform unicode to dict
+    
+    print delta
     
     if turtle:
         succeed = turtle.merge(delta)
@@ -186,8 +196,11 @@ def Merge():
     
     return jsonify({'result': succeed})
 
+# if using json type as delta
+# curl -i -H "Content-Type: application/json" -X PUT -d "{""contract_id"":""03081145-d15d-40d5-9b08-879da802e944"", ""delta"":""{"'0'": "0.1", "'1'": "0.8", "'2'": "0.35"}""}" http://localhost:5000/api/v1.0/merge
+#
+# if using array type as delta
 # curl -i -H "Content-Type: application/json" -X PUT -d "{""contract_id"":""03081145-d15d-40d5-9b08-879da802e944"", ""delta"":""[1,2,3]""}" http://localhost:5000/api/v1.0/merge
-
 
 
 

@@ -70,7 +70,7 @@ if __name__=='__main__':
     contractId = uuid.UUID("03081145-d15d-40d5-9b08-879da802e944")
     turtle = api.load_turtle(contractId);
     print turtle.weights
-    delta = [2]
+    delta = {"0": 0.1, "1": 0.8, "2": 0.35}
     turtle.merge(delta)
     print turtle.weights
     

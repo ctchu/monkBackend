@@ -126,21 +126,26 @@ class Crane(object):
                 
                 requestValue = fields[keyInTarget]
     
+                # [TODO] how to check what the data type is? e.g., datatime, string, dict/json etc.
                 if requestValue is not "" and requestValue is not None: 
                     useStringFormat = False
-                     # [TODO] how to check if it is array type or datetime type?
-                    if isinstance(requestValue, basestring) and not str(requestValue).startswith('ARRAY'):
+                    useJsonFormat = False
+                     
+                    if isinstance(requestValue, basestring) or isinstance(requestValue, datetime):
                         useStringFormat = True
-                    elif isinstance(requestValue, datetime):
-                        useStringFormat = True
+                    
+                    if isinstance(requestValue, dict):
+                        useJsonFormat = True
                         
-                    if useStringFormat: 
+                    if useStringFormat and not useJsonFormat: 
                         executePushString = "UPDATE {0} SET {1} = '{2}' WHERE _id = {3}".format(targetTableName, keyInTarget, requestValue, psycopg2.extensions.adapt(targetIdInTable).getquoted())
                         #print 'requestValue is string'
-                    else:
+                    elif not useStringFormat and not useJsonFormat: 
                         executePushString = "UPDATE {0} SET {1} = {2} WHERE _id = {3}".format(targetTableName, keyInTarget, requestValue, psycopg2.extensions.adapt(targetIdInTable).getquoted())
                         #print 'requestValue is not string'
-                    
+                    elif not useStringFormat and useJsonFormat: 
+                        executePushString = "UPDATE {0} SET {1} = {2} WHERE _id = {3}".format(targetTableName, keyInTarget, psycopg2.extras.Json(requestValue), psycopg2.extensions.adapt(targetIdInTable).getquoted())
+                        
                     executePushStrings.append(executePushString)
                     
             for executePushString in executePushStrings:
@@ -219,7 +224,7 @@ class Crane(object):
                                          'creator':obj.get('creator', cons.DEFAULT_CREATOR),
                                          'table_name':obj.get('table_name', cons.DEFAULT_TABLENAME)})
             if objId:
-                return self.load_one_by_id(objId['_id'])
+                return self.load_one_by_id(objId, obj.get('table_name', cons.DEFAULT_TABLENAME))
             elif 'monk_type' in obj:
                 obj = self.create_one(obj)
                 if tosave:

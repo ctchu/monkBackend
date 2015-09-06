@@ -7,5 +7,4 @@ creator: monk
 description:  default turtle
 m: 0
 rho: 0.001
-weights: ARRAY[0]
 weights_dimension: 1

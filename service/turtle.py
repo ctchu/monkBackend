@@ -26,7 +26,7 @@ class Turtle(base.MONKObject):
         self.m = 0
         self.rho = 1
         self.weights_dimension = 0
-        self.weights = []
+        self.weights = {}
         
     def __restore__(self):
         super(Turtle, self).__restore__()
@@ -76,11 +76,14 @@ class Turtle(base.MONKObject):
 #            logger.error('unable to merge in turtle {0}'.format(self._id))
 #            return False    
         
-        for i in range(len(delta)):        
-            self.weights[i] += delta[i]
+        scaleFactor = self.m + 1 / self.rho
+        for k in delta.keys():
+            if k in self.weights:
+                self.weights[k] += delta[k] / scaleFactor
+            else:
+                self.weights[k] = delta[k]
             
-        # not sure it is a good idea to transform list to postgre array type
-        self.store.update_one_in_fields(self, {'weights': "ARRAY" + str(self.weights)})
+        self.store.update_one_in_fields(self, {'weights': self.weights})
         
         return True
 
